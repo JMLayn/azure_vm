@@ -12,20 +12,24 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "WkstDemo" {
-  name     = "JMLaynRG2"
-  location = "eastus2"
+  name     = "${var.resourceGroup}"
+  location = "${var.resourceLocation}"
 
   tags {
-    do-not-remove = "do-not-remove"
-    X-Contact     = "JMLayn"
-    X-Application = "NA-East"
-    X-Dept        = "Sales"
-    X-Customer    = "Workstation Demo"
-    X-Project     = "Workstation Demo"
+    x-do-not-remove = "${var.x-do-not-remove}"
+    X-Contact     = "${var.X-Contact}"
+    X-Application = "${var.X-Application}"
+    X-Dept        = "${var.X-Dept}"
+    X-Customer    = "${var.X-Customer}"
+    X-Project     = "${var.X-Project}"
   }
 }
 
-#-----------network----------------
+# module "network" {
+#   source = "./network"
+# }
+
+# -----------network----------------
 resource "azurerm_virtual_network" "WkstDemo" {
   name                = "WkstDemoVNET"
   resource_group_name = "${azurerm_resource_group.WkstDemo.name}"
@@ -44,7 +48,7 @@ resource "azurerm_public_ip" "WkstDemo" {
   name                         = "WkstDemoPublicIp"
   resource_group_name          = "${azurerm_resource_group.WkstDemo.name}"
   location                     = "${azurerm_resource_group.WkstDemo.location}"
-  public_ip_address_allocation = "dynamic"
+  allocation_method            = "Dynamic"
 }
 
 #--------------security------------------
@@ -121,8 +125,4 @@ resource "azurerm_virtual_machine" "WkstDemo" {
 data "azurerm_public_ip" "WkstDemo" {
   name = "${azurerm_public_ip.WkstDemo.name}"
   resource_group_name = "${azurerm_virtual_machine.WkstDemo.resource_group_name}"
-}
-
-output "ip_address" {
-  value = "${data.azurerm_public_ip.WkstDemo.ip_address}"
 }
