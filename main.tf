@@ -4,7 +4,6 @@
 # output the ipaddress
 # modulize
 
-
 #-------------root/main.tf----------
 
 provider "azurerm" {
@@ -17,11 +16,11 @@ resource "azurerm_resource_group" "WkstDemo" {
 
   tags {
     x-do-not-remove = "${var.x-do-not-remove}"
-    X-Contact     = "${var.X-Contact}"
-    X-Application = "${var.X-Application}"
-    X-Dept        = "${var.X-Dept}"
-    X-Customer    = "${var.X-Customer}"
-    X-Project     = "${var.X-Project}"
+    X-Contact       = "${var.X-Contact}"
+    X-Application   = "${var.X-Application}"
+    X-Dept          = "${var.X-Dept}"
+    X-Customer      = "${var.X-Customer}"
+    X-Project       = "${var.X-Project}"
   }
 }
 
@@ -45,10 +44,10 @@ resource "azurerm_subnet" "WkstDemo" {
 }
 
 resource "azurerm_public_ip" "WkstDemo" {
-  name                         = "WkstDemoPublicIp"
-  resource_group_name          = "${azurerm_resource_group.WkstDemo.name}"
-  location                     = "${azurerm_resource_group.WkstDemo.location}"
-  allocation_method            = "Dynamic"
+  name                = "WkstDemoPublicIp"
+  resource_group_name = "${azurerm_resource_group.WkstDemo.name}"
+  location            = "${azurerm_resource_group.WkstDemo.location}"
+  allocation_method   = "Dynamic"
 }
 
 #--------------security------------------
@@ -65,6 +64,30 @@ resource "azurerm_network_security_group" "WkstDemo" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "22"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "Web"
+    priority                   = 1002
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "80"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "Web-Sec"
+    priority                   = 1003
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "443"
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
@@ -120,9 +143,34 @@ resource "azurerm_virtual_machine" "WkstDemo" {
       key_data = "${file("~/.ssh/id_rsa.pub")}"
     }
   }
+
+  provisioner "file" {
+    source      = "/users/jlayn/bash-repo/install-chef-server.sh"
+    destination = "/tmp/install-chef-server.sh"
+
+    connection {
+      type        = "ssh"
+      user        = "azureuser"
+      private_key = "${file("~/.ssh/id_rsa")}"
+    }
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo chmod +x /tmp/install-chef-server.sh",
+      "sudo /tmp/install-chef-server.sh",
+      "sudo chef-server-ctl install chef-manage",
+    ]
+
+    connection {
+      type        = "ssh"
+      user        = "azureuser"
+      private_key = "${file("~/.ssh/id_rsa")}"
+    }
+  }
 }
 
 data "azurerm_public_ip" "WkstDemo" {
-  name = "${azurerm_public_ip.WkstDemo.name}"
+  name                = "${azurerm_public_ip.WkstDemo.name}"
   resource_group_name = "${azurerm_virtual_machine.WkstDemo.resource_group_name}"
 }
