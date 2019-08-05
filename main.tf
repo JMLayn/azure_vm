@@ -1,7 +1,6 @@
 # Simple terraform to spin up a Azure VM for Workstation deployment_mode
 
 #TODO
-# output the ipaddress
 # modulize
 
 
@@ -24,10 +23,6 @@ resource "azurerm_resource_group" "WkstDemo" {
     X-Project     = "${var.X-Project}"
   }
 }
-
-# module "network" {
-#   source = "./network"
-# }
 
 # -----------network----------------
 resource "azurerm_virtual_network" "WkstDemo" {
@@ -101,9 +96,9 @@ resource "azurerm_virtual_machine" "WkstDemo" {
   }
 
   storage_image_reference {
-    publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "16.04.0-LTS"
+    publisher = "OpenLogic"
+    offer     = "CentOS"
+    sku       = "7.5"
     version   = "latest"
   }
 
