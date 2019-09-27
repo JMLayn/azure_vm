@@ -7,20 +7,20 @@
 #-------------root/main.tf----------
 
 provider "azurerm" {
-  version = "=1.21.0"
+  version = "~> 1.27"
 }
 
 resource "azurerm_resource_group" "WkstDemo" {
   name     = "${var.resourceGroup}"
   location = "${var.resourceLocation}"
 
-  tags {
+  tags = {
     x-do-not-remove = "${var.x-do-not-remove}"
-    X-Contact     = "${var.X-Contact}"
-    X-Application = "${var.X-Application}"
-    X-Dept        = "${var.X-Dept}"
-    X-Customer    = "${var.X-Customer}"
-    X-Project     = "${var.X-Project}"
+    X-Contact       = "${var.X-Contact}"
+    X-Application   = "${var.X-Application}"
+    X-Dept          = "${var.X-Dept}"
+    X-Customer      = "${var.X-Customer}"
+    X-Project       = "${var.X-Project}"
   }
 }
 
@@ -40,10 +40,10 @@ resource "azurerm_subnet" "WkstDemo" {
 }
 
 resource "azurerm_public_ip" "WkstDemo" {
-  name                         = "WkstDemoPublicIp"
-  resource_group_name          = "${azurerm_resource_group.WkstDemo.name}"
-  location                     = "${azurerm_resource_group.WkstDemo.location}"
-  allocation_method            = "Dynamic"
+  name                = "WkstDemoPublicIp"
+  resource_group_name = "${azurerm_resource_group.WkstDemo.name}"
+  location            = "${azurerm_resource_group.WkstDemo.location}"
+  allocation_method   = "Dynamic"
 }
 
 #--------------security------------------
@@ -112,12 +112,12 @@ resource "azurerm_virtual_machine" "WkstDemo" {
 
     ssh_keys {
       path     = "/home/azureuser/.ssh/authorized_keys"
-      key_data = "${file("~/.ssh/id_rsa.pub")}"
+      key_data = "${file("~/.ssh/jmlayn_rsa.pub")}"
     }
   }
 }
 
 data "azurerm_public_ip" "WkstDemo" {
-  name = "${azurerm_public_ip.WkstDemo.name}"
+  name                = "${azurerm_public_ip.WkstDemo.name}"
   resource_group_name = "${azurerm_virtual_machine.WkstDemo.resource_group_name}"
 }
