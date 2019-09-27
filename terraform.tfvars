@@ -1,2 +1,2 @@
 X-Customer = "Test"
-X-Project = "Chef Workstation"
+X-Project  = "Chef Workstation"
