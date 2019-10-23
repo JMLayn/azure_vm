@@ -7,7 +7,7 @@
 #-------------root/main.tf----------
 
 provider "azurerm" {
-  version = "~> 1.27"
+  # version = "~> 1.27"
 }
 
 resource "azurerm_resource_group" "WkstDemo" {
